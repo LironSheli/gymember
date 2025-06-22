@@ -67,7 +67,7 @@ const emailTemplates = {
     `,
   }),
 
-  welcome: (userEmail: string) => ({
+  welcome: (userEmail: string, _?: string) => ({
     subject: "Welcome to Gymember!",
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f9fa;">
@@ -117,7 +117,7 @@ const emailTemplates = {
     `,
   }),
 
-  passwordChanged: (userEmail: string) => ({
+  passwordChanged: (userEmail: string, _?: string) => ({
     subject: "Password Changed Successfully - Gymember",
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f9fa;">
@@ -169,14 +169,23 @@ export const sendEmail = async (
     let emailContent;
 
     if (template === "passwordReset" && typeof emailTemplate === "function") {
+      if (!data.userEmail || !data.resetLink) {
+        throw new Error("Missing required data for password reset email");
+      }
       emailContent = emailTemplate(data.userEmail, data.resetLink);
     } else if (template === "welcome" && typeof emailTemplate === "function") {
-      emailContent = emailTemplate(data.userEmail);
+      if (!data.userEmail) {
+        throw new Error("Missing required data for welcome email");
+      }
+      emailContent = emailTemplate(data.userEmail, "");
     } else if (
       template === "passwordChanged" &&
       typeof emailTemplate === "function"
     ) {
-      emailContent = emailTemplate(data.userEmail);
+      if (!data.userEmail) {
+        throw new Error("Missing required data for password changed email");
+      }
+      emailContent = emailTemplate(data.userEmail, "");
     } else {
       throw new Error("Invalid email template or missing data");
     }

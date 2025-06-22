@@ -24,9 +24,10 @@ async function getUserFromToken(request: NextRequest) {
 // GET /api/training/sessions/[id] - Get specific training session
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const user = await getUserFromToken(request);
     if (!user) {
       return NextResponse.json(
@@ -35,7 +36,7 @@ export async function GET(
       );
     }
 
-    const sessionId = parseInt(params.id);
+    const sessionId = parseInt(id);
     if (isNaN(sessionId)) {
       return NextResponse.json(
         { error: "Invalid session ID" },
@@ -68,9 +69,10 @@ export async function GET(
 // PUT /api/training/sessions/[id] - Update training session
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const user = await getUserFromToken(request);
     if (!user) {
       return NextResponse.json(
@@ -79,7 +81,7 @@ export async function PUT(
       );
     }
 
-    const sessionId = parseInt(params.id);
+    const sessionId = parseInt(id);
     if (isNaN(sessionId)) {
       return NextResponse.json(
         { error: "Invalid session ID" },
@@ -174,9 +176,10 @@ export async function PUT(
 // DELETE /api/training/sessions/[id] - Delete training session
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const user = await getUserFromToken(request);
     if (!user) {
       return NextResponse.json(
@@ -185,7 +188,7 @@ export async function DELETE(
       );
     }
 
-    const sessionId = parseInt(params.id);
+    const sessionId = parseInt(id);
     if (isNaN(sessionId)) {
       return NextResponse.json(
         { error: "Invalid session ID" },
