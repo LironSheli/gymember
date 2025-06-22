@@ -96,6 +96,9 @@ export function WorkoutScreen({ onBackToDashboard }: WorkoutScreenProps) {
   const [exerciseHistory, setExerciseHistory] = useState<{
     [key: string]: string;
   }>({});
+  const [categoryHistory, setCategoryHistory] = useState<{
+    [key: string]: string;
+  }>({});
   const [tooltipContent, setTooltipContent] = useState("");
   const [showTooltip, setShowTooltip] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
@@ -188,6 +191,7 @@ export function WorkoutScreen({ onBackToDashboard }: WorkoutScreenProps) {
       if (response.ok) {
         const data = await response.json();
         setExerciseHistory(data.exerciseHistory || {});
+        setCategoryHistory(data.categoryHistory || {});
       }
     } catch (error) {
       console.error("Failed to load exercise history:", error);
@@ -204,9 +208,30 @@ export function WorkoutScreen({ onBackToDashboard }: WorkoutScreenProps) {
     });
   };
 
-  const getLastPerformedDate = (categoryOrExercise: string) => {
-    const lastDate = exerciseHistory[categoryOrExercise];
+  const getLastPerformedDate = (
+    categoryOrExercise: string,
+    isCategory: boolean = false
+  ) => {
+    const history = isCategory ? categoryHistory : exerciseHistory;
+    const lastDate = history[categoryOrExercise];
     return lastDate ? formatDate(lastDate) : "";
+  };
+
+  const getDaysSinceLastPerformed = (
+    categoryOrExercise: string,
+    isCategory: boolean = false
+  ) => {
+    const history = isCategory ? categoryHistory : exerciseHistory;
+    const lastDate = history[categoryOrExercise];
+
+    if (!lastDate) return null;
+
+    const lastPerformedDate = new Date(lastDate);
+    const today = new Date();
+    const diffTime = Math.abs(today.getTime() - lastPerformedDate.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    return diffDays;
   };
 
   const formatTime = (seconds: number) => {
@@ -614,7 +639,12 @@ export function WorkoutScreen({ onBackToDashboard }: WorkoutScreenProps) {
           <div className="grid grid-cols-2 gap-4 w-full max-w-md">
             {categories.map((category) => {
               const lastPerformed = getLastPerformedDate(
-                translate(`category.${category.name_key}`)
+                translate(`category.${category.name_key}`),
+                true
+              );
+              const daysSinceLastPerformed = getDaysSinceLastPerformed(
+                translate(`category.${category.name_key}`),
+                true
               );
               return (
                 <button
@@ -628,6 +658,12 @@ export function WorkoutScreen({ onBackToDashboard }: WorkoutScreenProps) {
                     {lastPerformed && (
                       <div className="text-xs text-gray-400 mt-1">
                         {translate("lastPerformed")} {lastPerformed}
+                      </div>
+                    )}
+                    {daysSinceLastPerformed && (
+                      <div className="text-xs text-gray-400 mt-1">
+                        {translate("daysSinceLastPerformed")}{" "}
+                        {daysSinceLastPerformed}
                       </div>
                     )}
                   </div>
@@ -653,7 +689,12 @@ export function WorkoutScreen({ onBackToDashboard }: WorkoutScreenProps) {
           <div className="grid grid-cols-1 gap-4">
             {exercises.map((exercise) => {
               const lastPerformed = getLastPerformedDate(
-                translate(exercise.title_key || exercise.name_key)
+                translate(exercise.title_key || exercise.name_key),
+                false
+              );
+              const daysSinceLastPerformed = getDaysSinceLastPerformed(
+                translate(exercise.title_key || exercise.name_key),
+                false
               );
               const exerciseDescription = translate(
                 exercise.desc_key || exercise.name_key
@@ -697,6 +738,12 @@ export function WorkoutScreen({ onBackToDashboard }: WorkoutScreenProps) {
                     {lastPerformed && (
                       <div className="text-xs text-gray-400 mt-1">
                         {translate("lastPerformed")} {lastPerformed}
+                      </div>
+                    )}
+                    {daysSinceLastPerformed && (
+                      <div className="text-xs text-gray-400 mt-1">
+                        {translate("daysSinceLastPerformed")}{" "}
+                        {daysSinceLastPerformed}
                       </div>
                     )}
                   </div>

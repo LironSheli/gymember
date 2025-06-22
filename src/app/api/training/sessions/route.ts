@@ -39,54 +39,65 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get("category");
     const exercise = searchParams.get("exercise");
 
-    // If category or exercise is specified, get exercise history
-    if (category || exercise) {
-      let sql = `
-        SELECT 
-          ts.start_time,
-          ts.session_data
-        FROM training_sessions ts
-        WHERE ts.user_id = ? AND ts.status = 'completed'
-        ORDER BY ts.start_time DESC
-        LIMIT 100
-      `;
-      const params: any[] = [user.userId];
+    // Get recent sessions for exercise history
+    const recentSessionsSql = `
+      SELECT 
+        ts.start_time,
+        ts.session_data
+      FROM training_sessions ts
+      WHERE ts.user_id = ? AND ts.status = 'completed'
+      ORDER BY ts.start_time DESC
+      LIMIT 100
+    `;
 
-      const sessions = (await query(sql, params)) as any[];
+    const recentSessions = (await query(recentSessionsSql, [
+      user.userId,
+    ])) as any[];
 
-      const exerciseHistory: { [key: string]: string } = {};
+    const exerciseHistory: { [key: string]: string } = {};
+    const categoryHistory: { [key: string]: string } = {};
 
-      for (const session of sessions) {
-        try {
-          const sessionData = JSON.parse(session.session_data || "{}");
-          const exercises = sessionData.exercises || [];
+    for (const session of recentSessions) {
+      try {
+        const sessionData = JSON.parse(session.session_data || "{}");
+        const exercises = sessionData.exercises || [];
 
-          for (const exerciseData of exercises) {
-            const exerciseName = exerciseData.exerciseName;
-            const exerciseCategory = exerciseData.category;
+        for (const exerciseData of exercises) {
+          const exerciseName = exerciseData.exerciseName;
+          const exerciseCategory = exerciseData.category;
 
-            // If we're filtering by category
-            if (category && exerciseCategory !== category) {
-              continue;
-            }
-
-            // If we're filtering by exercise name
-            if (exercise && exerciseName !== exercise) {
-              continue;
-            }
-
-            // Store the most recent date for this exercise/category
-            const dateKey = exercise ? exerciseName : exerciseCategory;
-            if (!exerciseHistory[dateKey]) {
-              exerciseHistory[dateKey] = session.start_time;
-            }
+          // Store the most recent date for this exercise
+          if (!exerciseHistory[exerciseName]) {
+            exerciseHistory[exerciseName] = session.start_time;
           }
-        } catch (e) {
-          console.error("Error parsing session data:", e);
+
+          // Store the most recent date for this category
+          if (!categoryHistory[exerciseCategory]) {
+            categoryHistory[exerciseCategory] = session.start_time;
+          }
         }
+      } catch (e) {
+        console.error("Error parsing session data:", e);
+      }
+    }
+
+    // If category or exercise is specified, return filtered history
+    if (category || exercise) {
+      const filteredHistory: { [key: string]: string } = {};
+
+      if (category) {
+        filteredHistory[category] = categoryHistory[category] || "";
       }
 
-      return NextResponse.json({ exerciseHistory });
+      if (exercise) {
+        filteredHistory[exercise] = exerciseHistory[exercise] || "";
+      }
+
+      return NextResponse.json({
+        exerciseHistory: filteredHistory,
+        categoryHistory: categoryHistory,
+        allExerciseHistory: exerciseHistory,
+      });
     }
 
     // Regular sessions query
@@ -107,7 +118,11 @@ export async function GET(request: NextRequest) {
 
     const sessions = (await query(sql, params)) as any[];
 
-    return NextResponse.json({ sessions });
+    return NextResponse.json({
+      sessions,
+      exerciseHistory,
+      categoryHistory,
+    });
   } catch (error) {
     console.error("Get training sessions error:", error);
     return NextResponse.json(
