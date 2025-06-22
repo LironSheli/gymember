@@ -55,11 +55,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // Check if user is authenticated on mount
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
   const checkAuth = async () => {
     try {
       const token = getToken();
@@ -96,6 +91,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false);
     }
   };
+
+  // Check if user is authenticated on mount
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
 
   const signIn = async (email: string, password: string) => {
     try {
