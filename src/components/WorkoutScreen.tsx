@@ -237,6 +237,11 @@ export function WorkoutScreen({ onBackToDashboard }: WorkoutScreenProps) {
   };
 
   const handleAddSet = () => {
+    if (!currentExercise) {
+      alert(translate("selectExerciseFirst"));
+      return;
+    }
+
     if (
       currentWeight === "" ||
       isNaN(Number(currentWeight)) ||
@@ -244,6 +249,22 @@ export function WorkoutScreen({ onBackToDashboard }: WorkoutScreenProps) {
     ) {
       alert(translate("invalidWeight"));
       return;
+    }
+
+    // Check if this set already exists to prevent duplicates
+    const existingExercise = workoutData.find(
+      (item) => item.exerciseName === currentExercise
+    );
+
+    if (existingExercise) {
+      const existingSet = existingExercise.sets.find(
+        (set: ExerciseSet) => set.setNumber === currentSetNumber
+      );
+
+      if (existingSet) {
+        console.log("Set already exists, skipping...");
+        return;
+      }
     }
 
     const newSet = {
@@ -288,7 +309,9 @@ export function WorkoutScreen({ onBackToDashboard }: WorkoutScreenProps) {
   };
 
   const handleNextExercise = () => {
+    // Only add set if we have a current exercise and valid weight
     if (
+      currentExercise &&
       currentWeight !== "" &&
       !isNaN(Number(currentWeight)) &&
       Number(currentWeight) >= 0
@@ -321,7 +344,9 @@ export function WorkoutScreen({ onBackToDashboard }: WorkoutScreenProps) {
   };
 
   const handleEndWorkout = async () => {
+    // Only add set if we have a current exercise and valid weight
     if (
+      currentExercise &&
       currentWeight !== "" &&
       !isNaN(Number(currentWeight)) &&
       Number(currentWeight) >= 0
