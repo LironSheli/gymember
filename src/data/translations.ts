@@ -61,6 +61,7 @@ export const translations = {
     backToDashboard: "חזרה לדאשבורד",
     backToHistory: "חזרה להיסטוריה",
     backToCategories: "חזרה לקטגוריות",
+    backToLogin: "חזרה להתחברות",
     invalidWeight: "אנא הזן משקל חוקי.",
     invalidReps: "אנא הזן מספר חזרות חוקי (1-100).",
     selectExerciseFirst: "אנא בחר תרגיל תחילה.",
@@ -68,6 +69,8 @@ export const translations = {
     weight: "משקל",
     notLoggedIn: "לא מחובר",
     workoutIn: "אימון ב",
+    noHistoryYet: "אין היסטוריה עדיין",
+    sendResetLink: "שלח קישור איפוס",
 
     // Feedback
     setCompletedFeedback: "הסט נשמר! אפשר להתחיל סט חדש",
@@ -75,6 +78,12 @@ export const translations = {
     setNotes: "הערות לסט",
     setNotesPlaceholder: "הוסף הערות לסט (אופציונלי)",
     backToExercises: "חזרה לתרגילים",
+    exerciseInstructions: "הוראות ביצוע",
+    showInstructions: "הצג הוראות",
+    hideInstructions: "הסתר הוראות",
+    exerciseNotes: "הערות לתרגיל",
+    exerciseNotesPlaceholder: "הוסף הערות לתרגיל (אופציונלי)",
+    editExerciseNotes: "ערוך הערות לתרגיל",
 
     // Exercise Categories
     "category.chest": "חזה",
@@ -305,6 +314,7 @@ export const translations = {
     backToDashboard: "Back to Dashboard",
     backToHistory: "Back to History",
     backToCategories: "Back to Categories",
+    backToLogin: "Back to Login",
     invalidWeight: "Please enter a valid weight.",
     invalidReps: "Please enter a valid number of reps (1-100).",
     selectExerciseFirst: "Please select the first exercise.",
@@ -312,13 +322,21 @@ export const translations = {
     weight: "Weight",
     notLoggedIn: "Not logged in",
     workoutIn: "Workout in",
+    noHistoryYet: "אין היסטוריה עדיין",
+    sendResetLink: "Send Reset Link",
 
     // Feedback
     setCompletedFeedback: "Set saved! Start your next set.",
     saveSet: "Save Set",
     setNotes: "Set Notes",
-    setNotesPlaceholder: "Add notes to set (optional)",
+    setNotesPlaceholder: "Add set notes (optional)",
     backToExercises: "Back to Exercises",
+    exerciseInstructions: "Instructions",
+    showInstructions: "Show Instructions",
+    hideInstructions: "Hide Instructions",
+    exerciseNotes: "Exercise Notes",
+    exerciseNotesPlaceholder: "Add exercise notes (optional)",
+    editExerciseNotes: "Edit Exercise Notes",
 
     // Exercise Categories
     "category.chest": "Chest",

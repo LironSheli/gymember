@@ -142,7 +142,8 @@ export function AuthScreen() {
               <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
             ) : (
               <>
-                <Mail className="ml-2" size={20} /> Send Reset Link
+                <span>{translate("sendResetLink")}</span>
+                <Mail className="ml-2" size={20} />
               </>
             )}
           </button>
@@ -217,7 +218,7 @@ export function AuthScreen() {
             ) : (
               <>
                 <span>{translate("resetPassword")}</span>
-                <Lock size={20} />
+                <Lock size={20} className="ml-2" />
               </>
             )}
           </button>
@@ -310,15 +311,16 @@ export function AuthScreen() {
         >
           {isLoading ? (
             <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-          ) : mode === "login" ? (
-            <>
-              <span>{translate("signIn")}</span>
-              <LogIn size={20} />
-            </>
           ) : (
             <>
-              <span>{translate("signUp")}</span>
-              <UserPlus size={20} />
+              <span>
+                {mode === "login" ? translate("signIn") : translate("signUp")}
+              </span>
+              {mode === "login" ? (
+                <LogIn size={20} className="ml-2" />
+              ) : (
+                <UserPlus size={20} className="ml-2" />
+              )}
             </>
           )}
         </button>
@@ -334,8 +336,8 @@ export function AuthScreen() {
             onClick={toggleLanguage}
             className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-3 rounded-xl transition duration-300 ease-in-out flex items-center"
           >
-            <Globe className="mr-2" size={20} />
             {language === "he" ? "English" : "עברית"}
+            <Globe className="ml-2" size={20} />
           </button>
         </div>
 
@@ -344,8 +346,8 @@ export function AuthScreen() {
             onClick={goToLogin}
             className="flex items-center text-indigo-400 hover:text-indigo-300 text-sm font-medium transition duration-200 mb-4"
           >
-            <ArrowLeft className="mr-2" size={16} />
-            {translate("backToDashboard")}
+            {translate("backToLogin")}
+            <ArrowLeft className="ml-2" size={16} />
           </button>
         )}
 

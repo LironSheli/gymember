@@ -34,8 +34,8 @@ export function Dashboard({
             onClick={toggleLanguage}
             className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-3 rounded-xl transition duration-300 ease-in-out flex items-center"
           >
-            <Globe className="mr-2" size={20} />
             {language === "he" ? "English" : "עברית"}
+            <Globe className="ml-2" size={20} />
           </button>
         </div>
         <h1 className="text-4xl font-extrabold text-white mb-8">
@@ -47,21 +47,21 @@ export function Dashboard({
             className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-xl transition duration-300 ease-in-out transform hover:scale-105 shadow-lg flex items-center justify-between text-lg px-6"
           >
             <span>{translate("startWorkout")}</span>
-            <Play size={24} />
+            <Play size={24} className="ml-2" />
           </button>
           <button
             onClick={onViewHistory}
             className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-xl transition duration-300 ease-in-out transform hover:scale-105 shadow-lg flex items-center justify-between text-lg px-6"
           >
             <span>{translate("workoutHistory")}</span>
-            <BarChart3 size={24} />
+            <BarChart3 size={24} className="ml-2" />
           </button>
           <button
             onClick={handleSignOut}
             className="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 rounded-xl transition duration-300 ease-in-out transform hover:scale-105 shadow-lg flex items-center justify-between text-lg px-6"
           >
             <span>{translate("signOut")}</span>
-            <LogOut size={24} />
+            <LogOut size={24} className="ml-2" />
           </button>
         </div>
         <p className="mt-8 text-gray-400 text-sm">

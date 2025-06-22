@@ -6,9 +6,12 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // For other API routes, just check if Authorization header exists
+  // For protected API routes, check if Authorization header exists
   // Let the individual API routes handle JWT verification
-  if (request.nextUrl.pathname.startsWith("/api/")) {
+  if (
+    request.nextUrl.pathname.startsWith("/api/training/") ||
+    request.nextUrl.pathname.startsWith("/api/exercises/")
+  ) {
     const authHeader = request.headers.get("authorization");
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {

@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { query } from "@/lib/db";
 
-const JWT_SECRET = process.env.JWT_SECRET || "XYZ";
+const JWT_SECRET =
+  process.env.JWT_SECRET ||
+  "gymember_super_secret_jwt_key_2024_secure_and_random";
 
 export async function GET(request: NextRequest) {
   try {
@@ -20,8 +22,10 @@ export async function GET(request: NextRequest) {
 
     const token = authHeader.substring(7); // Remove "Bearer " prefix
     console.log("ME API: Token extracted, length:", token.length);
+    console.log("ME API: Token preview:", token.substring(0, 20) + "...");
 
     try {
+      console.log("ME API: Verifying JWT token");
       const decoded = jwt.verify(token, JWT_SECRET) as any;
       console.log("ME API: Token verified, userId:", decoded.userId);
       const userId = decoded.userId;

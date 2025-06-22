@@ -11,6 +11,7 @@ import {
 import { useLanguage } from "../contexts/LanguageContext";
 import { useAuth } from "../contexts/AuthContext";
 import { TrainingSession } from "../types";
+import { formatDateRelative, formatDuration } from "../utils/formatTime";
 
 interface WorkoutHistoryProps {
   onBackToDashboard: () => void;
@@ -60,30 +61,6 @@ export function WorkoutHistory({ onBackToDashboard }: WorkoutHistoryProps) {
     }
   };
 
-  const formatDuration = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const remainingSeconds = seconds % 60;
-
-    if (hours > 0) {
-      return `${hours}:${minutes.toString().padStart(2, "0")}:${remainingSeconds
-        .toString()
-        .padStart(2, "0")}`;
-    }
-    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("he-IL", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
   const getSessionStats = (session: TrainingSession) => {
     try {
       const sessionData =
@@ -100,14 +77,14 @@ export function WorkoutHistory({ onBackToDashboard }: WorkoutHistoryProps) {
       return {
         exerciseCount: exercises.length,
         totalSets,
-        duration: formatDuration(session.total_time),
+        duration: formatDuration(session.total_time * 1000),
       };
     } catch (error) {
       console.error("Error parsing session data:", error);
       return {
         exerciseCount: 0,
         totalSets: 0,
-        duration: formatDuration(session.total_time),
+        duration: formatDuration(session.total_time * 1000),
       };
     }
   };
@@ -156,8 +133,8 @@ export function WorkoutHistory({ onBackToDashboard }: WorkoutHistoryProps) {
               onClick={() => setSelectedSession(null)}
               className="flex items-center text-sky-400 hover:text-sky-300 text-sm font-medium transition duration-200"
             >
-              <ArrowLeft className="mr-2" size={16} />
               {translate("backToHistory")}
+              <ArrowLeft className="ml-2" size={16} />
             </button>
             <h1 className="text-3xl font-extrabold text-white">
               {translate("workoutDetails")}
@@ -167,20 +144,20 @@ export function WorkoutHistory({ onBackToDashboard }: WorkoutHistoryProps) {
           <div className="bg-gray-700 p-6 rounded-xl mb-6">
             <h2 className="text-2xl font-bold text-white mb-4">
               {selectedSession.session_name ||
-                `אימון ${formatDate(selectedSession.start_time)}`}
+                `אימון ${formatDateRelative(selectedSession.start_time)}`}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               <div className="flex items-center text-gray-300">
-                <Calendar className="mr-2" size={20} />
-                {formatDate(selectedSession.start_time)}
+                {formatDateRelative(selectedSession.start_time)}
+                <Calendar className="ml-2" size={20} />
               </div>
               <div className="flex items-center text-gray-300">
-                <Clock className="mr-2" size={20} />
-                {formatDuration(selectedSession.total_time)}
+                {formatDuration(selectedSession.total_time * 1000)}
+                <Clock className="ml-2" size={20} />
               </div>
               <div className="flex items-center text-gray-300">
-                <Activity className="mr-2" size={20} />
                 {sessionData.exercises?.length || 0} תרגילים
+                <Activity className="ml-2" size={20} />
               </div>
             </div>
             {selectedSession.notes && (
@@ -214,7 +191,7 @@ export function WorkoutHistory({ onBackToDashboard }: WorkoutHistoryProps) {
                           <div className="text-gray-300 text-sm">
                             {set.weight} {translate("kg")} × {set.reps} reps
                             {set.duration &&
-                              ` (${formatDuration(set.duration)})`}
+                              ` (${formatDuration(set.duration * 1000)})`}
                           </div>
                         </div>
                         {set.notes && (
@@ -256,8 +233,8 @@ export function WorkoutHistory({ onBackToDashboard }: WorkoutHistoryProps) {
             onClick={onBackToDashboard}
             className="flex items-center text-sky-400 hover:text-sky-300 text-sm font-medium transition duration-200"
           >
-            <ArrowLeft className="mr-2" size={16} />
             {translate("backToDashboard")}
+            <ArrowLeft className="ml-2" size={16} />
           </button>
           <h1 className="text-3xl font-extrabold text-white">
             {translate("workoutHistory")}
@@ -288,20 +265,20 @@ export function WorkoutHistory({ onBackToDashboard }: WorkoutHistoryProps) {
                     <div className="flex-1">
                       <h3 className="text-xl font-bold text-white mb-2">
                         {session.session_name ||
-                          `אימון ${formatDate(session.start_time)}`}
+                          `אימון ${formatDateRelative(session.start_time)}`}
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-300">
                         <div className="flex items-center">
-                          <Calendar className="mr-2" size={16} />
-                          {formatDate(session.start_time)}
+                          {formatDateRelative(session.start_time)}
+                          <Calendar className="ml-2" size={16} />
                         </div>
                         <div className="flex items-center">
-                          <Clock className="mr-2" size={16} />
                           {stats.duration}
+                          <Clock className="ml-2" size={16} />
                         </div>
                         <div className="flex items-center">
-                          <Activity className="mr-2" size={16} />
                           {stats.exerciseCount} תרגילים, {stats.totalSets} סטים
+                          <Activity className="ml-2" size={16} />
                         </div>
                       </div>
                       {session.notes && (

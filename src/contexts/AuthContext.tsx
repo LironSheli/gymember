@@ -3,6 +3,7 @@ import React, {
   useContext,
   useState,
   useEffect,
+  useCallback,
   ReactNode,
 } from "react";
 
@@ -36,7 +37,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Get token from localStorage
   const getToken = () => {
     if (typeof window !== "undefined") {
-      return localStorage.getItem("gymember_token");
+      try {
+        const token = localStorage.getItem("gymember_token");
+        console.log("getToken: Retrieved token from localStorage:", !!token);
+        return token;
+      } catch (error) {
+        console.error("getToken: Error accessing localStorage:", error);
+        return null;
+      }
     }
     return null;
   };
@@ -44,25 +52,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Set token in localStorage
   const setToken = (token: string) => {
     if (typeof window !== "undefined") {
-      localStorage.setItem("gymember_token", token);
+      try {
+        localStorage.setItem("gymember_token", token);
+        console.log("setToken: Token saved to localStorage successfully");
+      } catch (error) {
+        console.error("setToken: Error saving to localStorage:", error);
+      }
     }
   };
 
   // Remove token from localStorage
   const removeToken = () => {
     if (typeof window !== "undefined") {
-      localStorage.removeItem("gymember_token");
+      try {
+        localStorage.removeItem("gymember_token");
+        console.log("removeToken: Token removed from localStorage");
+      } catch (error) {
+        console.error("removeToken: Error removing from localStorage:", error);
+      }
     }
   };
 
-  const checkAuth = async () => {
+  const checkAuth = useCallback(async () => {
     try {
       const token = getToken();
       console.log("Checking auth, token exists:", !!token);
+      console.log(
+        "Token value:",
+        token ? token.substring(0, 20) + "..." : "null"
+      );
 
       if (!token) {
         console.log("No token found, setting loading to false");
         setLoading(false);
+        setUser(null);
         return;
       }
 
@@ -74,32 +97,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       console.log("Auth check response status:", response.status);
+      console.log(
+        "Auth check response headers:",
+        Object.fromEntries(response.headers.entries())
+      );
 
       if (response.ok) {
         const data = await response.json();
         console.log("Auth check successful, user:", data.user);
         setUser(data.user);
       } else {
-        console.log("Auth check failed, removing token");
+        const errorData = await response.json().catch(() => ({}));
+        console.log("Auth check failed, error:", errorData);
         // Token is invalid, remove it
         removeToken();
+        setUser(null);
       }
     } catch (error) {
       console.error("Auth check error:", error);
       removeToken();
+      setUser(null);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   // Check if user is authenticated on mount
   useEffect(() => {
+    console.log("AuthContext: useEffect triggered, checking auth");
     checkAuth();
   }, [checkAuth]);
 
   const signIn = async (email: string, password: string) => {
     try {
       setError("");
+      console.log("Signing in with email:", email);
+
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: {
@@ -109,15 +142,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       const data = await response.json();
+      console.log("Login response status:", response.status);
+      console.log("Login response data:", {
+        ...data,
+        token: data.token ? data.token.substring(0, 20) + "..." : "null",
+      });
 
       if (!response.ok) {
         throw new Error(data.error || "Login failed");
       }
 
       // Save token to localStorage
+      console.log("Saving token to localStorage");
       setToken(data.token);
+      console.log("Setting user in state:", data.user);
       setUser(data.user);
     } catch (error) {
+      console.error("Sign in error:", error);
       setError(error instanceof Error ? error.message : "Login failed");
       throw error;
     }

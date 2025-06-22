@@ -4,7 +4,9 @@ import jwt from "jsonwebtoken";
 import { query } from "@/lib/db";
 import { sendWelcomeEmail } from "@/lib/email";
 
-const JWT_SECRET = process.env.JWT_SECRET || "XYZ";
+const JWT_SECRET =
+  process.env.JWT_SECRET ||
+  "gymember_super_secret_jwt_key_2024_secure_and_random";
 
 export async function POST(request: NextRequest) {
   try {
